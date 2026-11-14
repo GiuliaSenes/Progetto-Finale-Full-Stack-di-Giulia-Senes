@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none" stroke="#1f1b18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="150" cy="150" r="42"/>
+  <circle cx="150" cy="150" r="30"/>
+  <path d="M150 80 L150 58"/>
+  <path d="M150 220 L150 242"/>
+  <path d="M80 150 L58 150"/>
+  <path d="M220 150 L242 150"/>
+  <path d="M100 100 L84 84"/>
+  <path d="M200 200 L216 216"/>
+  <path d="M200 100 L216 84"/>
+  <path d="M100 200 L84 216"/>
+  <path d="M122 88 L116 70"/>
+  <path d="M178 88 L184 70"/>
+  <path d="M122 212 L116 230"/>
+  <path d="M178 212 L184 230"/>
+  <path d="M88 122 L70 116"/>
+  <path d="M88 178 L70 184"/>
+  <path d="M212 122 L230 116"/>
+  <path d="M212 178 L230 184"/>
+</svg>
