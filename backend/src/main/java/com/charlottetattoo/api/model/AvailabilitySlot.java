@@ -10,11 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
-/** Una fascia oraria di 2 ore in cui Charlotte e' disponibile. */
+/** Una mezza giornata (mattina o pomeriggio) in cui Charlotte è disponibile. */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"date", "startTime"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"date", "period"}))
 public class AvailabilitySlot {
 
     @Id
@@ -24,11 +23,9 @@ public class AvailabilitySlot {
     @Column(nullable = false)
     private LocalDate date;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LocalTime startTime;
-
-    @Column(nullable = false)
-    private LocalTime endTime;
+    private DayPeriod period;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -40,11 +37,8 @@ public class AvailabilitySlot {
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
 
-    public LocalTime getStartTime() { return startTime; }
-    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
-
-    public LocalTime getEndTime() { return endTime; }
-    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+    public DayPeriod getPeriod() { return period; }
+    public void setPeriod(DayPeriod period) { this.period = period; }
 
     public SlotStatus getStatus() { return status; }
     public void setStatus(SlotStatus status) { this.status = status; }

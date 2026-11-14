@@ -25,16 +25,31 @@ const FAQ = [
   {
     question: 'Come funziona la prenotazione?',
     answer:
-      "Scegli un flash dalla galleria, scegli una data e un orario liberi e invia la richiesta. Charlotte la riceve e può accettarla oppure rifiutarla (in quel caso ti scrive il motivo). Puoi seguire lo stato nella pagina \"Le mie richieste\".",
+      "Scegli un flash dalla galleria, scegli un giorno e se preferisci la mattina o il pomeriggio, poi invia la richiesta. Charlotte la riceve e può accettarla, comunicandoti l'orario preciso, oppure rifiutarla (in quel caso ti scrive il motivo). Puoi seguire lo stato nella pagina \"Le mie richieste\".",
   },
   {
     question: 'Cosa significa "in attesa di conferma"?',
     answer:
-      "Quando qualcuno invia una richiesta, il flash e l'orario scelti vengono bloccati finché Charlotte non risponde. In questo modo non possono esserci due prenotazioni sullo stesso flash. Se la richiesta viene rifiutata o annullata, tornano subito disponibili.",
+      "Quando qualcuno invia una richiesta, il flash e la giornata scelti vengono bloccati finché Charlotte non risponde. In questo modo non possono esserci due prenotazioni sullo stesso flash. Se la richiesta viene rifiutata o annullata, tornano subito disponibili.",
+  },
+  {
+    question: "Quando scopro l'orario preciso?",
+    answer:
+      "Tu scegli solo il giorno e se preferisci mattina o pomeriggio. L'orario esatto te lo comunica Charlotte quando accetta la richiesta: lo trovi nella pagina \"Le mie richieste\".",
+  },
+  {
+    question: 'Dove sul corpo faccio il tatuaggio?',
+    answer:
+      'La zona del corpo si decide insieme a Charlotte, che ti consiglia il punto migliore per il disegno che hai scelto.',
   },
   {
     question: 'Quanto dura un tatuaggio flash?',
-    answer: 'Ogni appuntamento dura al massimo 2 ore, per questo il calendario è diviso in fasce da 2 ore.',
+    answer: 'Ogni appuntamento dura al massimo 2 ore, perché i flash sono disegni piccoli e veloci da realizzare.',
+  },
+  {
+    question: 'Ho dimenticato la password: cosa faccio?',
+    answer:
+      'Dalla pagina di accesso clicca su "Hai dimenticato la password?" e segui il link per sceglierne una nuova. Per accedere si usa sempre la tua email.',
   },
   {
     question: 'Posso modificare un flash?',

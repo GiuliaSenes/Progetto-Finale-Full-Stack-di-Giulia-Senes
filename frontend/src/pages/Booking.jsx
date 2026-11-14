@@ -3,9 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
 import Alert from '../components/Alert'
 import Calendar from '../components/Calendar'
-import { formatDate, formatSlot, formatTime } from '../utils/format'
+import { PERIODS, PERIOD_LABELS, formatDate, formatSlot } from '../utils/format'
 
-// Pagina di prenotazione: flash scelto -> calendario -> orario -> nota -> invio richiesta
+// Pagina di prenotazione: flash scelto -> calendario -> mattina/pomeriggio -> messaggio -> invio richiesta
 export default function Booking() {
   const { flashId } = useParams()
   const navigate = useNavigate()
@@ -49,11 +49,11 @@ export default function Booking() {
         note,
       })
       navigate('/my-bookings', {
-        state: { success: 'Richiesta inviata! Charlotte la vedrà presto e ti risponderà.' },
+        state: { success: 'Richiesta inviata! Charlotte ti risponderà confermando l\'orario preciso.' },
       })
     } catch (err) {
       setError(err.message)
-      // Qualcuno potrebbe aver preso lo slot nel frattempo: ricarichiamo la disponibilità
+      // Qualcuno potrebbe aver preso la giornata nel frattempo: ricarichiamo la disponibilità
       const [flashData, slotsData] = await Promise.all([
         api.get(`/api/flashes/${flashId}`),
         api.get('/api/slots'),
@@ -117,7 +117,7 @@ export default function Booking() {
 
           {selectedDate && (
             <>
-              <h2>2. Scegli l'orario</h2>
+              <h2>2. Scegli mattina o pomeriggio</h2>
               <p className="muted">{formatDate(selectedDate)}</p>
               <div className="slot-list">
                 {slotsOfSelectedDate.map((slot) => (
@@ -128,25 +128,30 @@ export default function Booking() {
                     onClick={() => setSelectedSlot(slot)}
                     aria-pressed={selectedSlot?.id === slot.id}
                   >
-                    {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                    {PERIOD_LABELS[slot.period]}
+                    <small>{PERIODS.find((p) => p.value === slot.period).hint}</small>
                   </button>
                 ))}
               </div>
+              <p className="muted small">
+                L'orario preciso non lo scegli tu: te lo comunicherà Charlotte quando accetta la richiesta.
+              </p>
             </>
           )}
 
           {selectedSlot && (
             <>
-              <h2>3. Aggiungi una nota (facoltativo)</h2>
+              <h2>3. Aggiungi un messaggio (facoltativo)</h2>
               <label>
-                Zona del corpo, dubbi o richieste
+                Dubbi o richieste per Charlotte
                 <textarea
                   rows={3}
                   maxLength={500}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Es. lo vorrei sulla caviglia"
+                  placeholder="Es. ho qualche dubbio sul punto in cui farlo"
                 />
+                <small>La zona del corpo dove tatuare la deciderai insieme a Charlotte.</small>
               </label>
 
               <div className="card summary">
@@ -154,8 +159,11 @@ export default function Booking() {
                 <p>Flash da {flash.size}</p>
                 <p>{formatSlot(selectedSlot)}</p>
                 <p className="muted">
+                  Orario da definire: te lo confermerà Charlotte. Anche la zona del corpo si decide insieme a lei.
+                </p>
+                <p className="muted">
                   La richiesta viene inviata a Charlotte, che può accettarla o rifiutarla. Nel frattempo il
-                  flash e l'orario restano bloccati per te.
+                  flash e la giornata restano bloccati per te.
                 </p>
               </div>
 

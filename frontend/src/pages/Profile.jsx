@@ -13,7 +13,8 @@ export default function Profile() {
   })
   const [profileMessage, setProfileMessage] = useState({ type: '', text: '' })
 
-  const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '' })
+  const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const passwordsDiffer = passwords.confirmPassword !== '' && passwords.newPassword !== passwords.confirmPassword
   const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' })
 
   async function handleProfileSubmit(event) {
@@ -31,9 +32,18 @@ export default function Profile() {
   async function handlePasswordSubmit(event) {
     event.preventDefault()
     setPasswordMessage({ type: '', text: '' })
+
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'Le due password non coincidono' })
+      return
+    }
+
     try {
-      await api.put('/api/users/me/password', passwords)
-      setPasswords({ currentPassword: '', newPassword: '' })
+      await api.put('/api/users/me/password', {
+        currentPassword: passwords.currentPassword,
+        newPassword: passwords.newPassword,
+      })
+      setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' })
       setPasswordMessage({ type: 'success', text: 'Password cambiata.' })
     } catch (err) {
       setPasswordMessage({ type: 'error', text: err.message })
@@ -112,6 +122,19 @@ export default function Profile() {
             required
           />
           <small>Almeno 8 caratteri.</small>
+        </label>
+
+        <label>
+          Conferma nuova password
+          <input
+            type="password"
+            value={passwords.confirmPassword}
+            onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+            autoComplete="new-password"
+            aria-invalid={passwordsDiffer}
+            required
+          />
+          {passwordsDiffer && <small className="field-error">Le due password non coincidono</small>}
         </label>
 
         <button className="btn" type="submit">Cambia password</button>

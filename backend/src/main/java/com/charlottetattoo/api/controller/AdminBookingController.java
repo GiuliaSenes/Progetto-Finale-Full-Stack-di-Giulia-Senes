@@ -1,5 +1,6 @@
 package com.charlottetattoo.api.controller;
 
+import com.charlottetattoo.api.dto.AcceptRequest;
 import com.charlottetattoo.api.dto.BookingResponse;
 import com.charlottetattoo.api.dto.Mapper;
 import com.charlottetattoo.api.dto.RejectRequest;
@@ -33,8 +34,8 @@ public class AdminBookingController {
     }
 
     @PutMapping("/{id}/accept")
-    public BookingResponse accept(@PathVariable Long id) {
-        return Mapper.toBooking(bookingService.accept(id));
+    public BookingResponse accept(@PathVariable Long id, @Valid @RequestBody AcceptRequest request) {
+        return Mapper.toBooking(bookingService.accept(id, request.time()));
     }
 
     @PutMapping("/{id}/reject")

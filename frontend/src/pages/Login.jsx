@@ -67,6 +67,10 @@ export default function Login() {
         <button className="btn" type="submit" disabled={submitting}>
           {submitting ? 'Accesso in corso...' : 'Accedi'}
         </button>
+
+        <p className="form-footer">
+          <Link to="/forgot-password" className="text-link">Hai dimenticato la password?</Link>
+        </p>
       </form>
 
       <p className="form-footer">

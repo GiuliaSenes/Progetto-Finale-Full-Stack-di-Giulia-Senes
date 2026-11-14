@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext'
 const STEPS = [
   { title: 'Registrati', text: 'Crea il tuo account in meno di un minuto.' },
   { title: 'Scegli il flash', text: 'Sfoglia la galleria e seleziona il disegno che ti piace.' },
-  { title: 'Scegli la data', text: 'Guarda il calendario con le disponibilità di Charlotte e scegli un orario.' },
-  { title: 'Aspetta la conferma', text: 'Charlotte riceve la richiesta e la accetta oppure ti spiega perché non può.' },
+  { title: 'Scegli la data', text: 'Guarda il calendario con le disponibilità di Charlotte e scegli il giorno, di mattina o di pomeriggio.' },
+  { title: 'Aspetta la conferma', text: 'Charlotte ti risponde con l\'orario preciso, oppure ti spiega perché non può.' },
 ]
 
 export default function Home() {

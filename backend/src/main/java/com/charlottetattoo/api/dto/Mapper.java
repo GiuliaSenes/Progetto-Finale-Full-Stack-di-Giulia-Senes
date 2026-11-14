@@ -27,14 +27,15 @@ public class Mapper {
     }
 
     public static SlotResponse toSlot(AvailabilitySlot slot) {
-        return new SlotResponse(slot.getId(), slot.getDate(), slot.getStartTime(),
-                slot.getEndTime(), slot.getStatus().name());
+        return new SlotResponse(slot.getId(), slot.getDate(), slot.getPeriod().name(),
+                slot.getStatus().name());
     }
 
     public static BookingResponse toBooking(Booking booking) {
         return new BookingResponse(booking.getId(), toFlash(booking.getFlash()),
                 toSlot(booking.getSlot()), toUser(booking.getUser()), booking.getNote(),
-                booking.getStatus().name(), booking.getRejectionReason(), booking.getCreatedAt());
+                booking.getStatus().name(), booking.getConfirmedTime(), booking.getRejectionReason(),
+                booking.getCreatedAt());
     }
 
     public static ConsultationResponse toConsultation(Consultation c) {

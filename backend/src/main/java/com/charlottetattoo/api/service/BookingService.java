@@ -5,6 +5,7 @@ import com.charlottetattoo.api.exception.ApiException;
 import com.charlottetattoo.api.model.AvailabilitySlot;
 import com.charlottetattoo.api.model.Booking;
 import com.charlottetattoo.api.model.BookingStatus;
+import com.charlottetattoo.api.model.DayPeriod;
 import com.charlottetattoo.api.model.Flash;
 import com.charlottetattoo.api.model.FlashStatus;
 import com.charlottetattoo.api.model.SlotStatus;
@@ -12,6 +13,7 @@ import com.charlottetattoo.api.model.User;
 import com.charlottetattoo.api.repository.BookingRepository;
 import com.charlottetattoo.api.repository.FlashRepository;
 import com.charlottetattoo.api.repository.SlotRepository;
+import java.time.LocalTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -65,10 +67,10 @@ public class BookingService {
             throw ApiException.conflict("Questo flash non è più disponibile");
         }
         if (slot.getStatus() != SlotStatus.FREE) {
-            throw ApiException.conflict("Questo orario è appena stato prenotato, scegline un altro");
+            throw ApiException.conflict("Questa giornata è appena stata prenotata, scegline un'altra");
         }
         if (SlotService.isInPast(slot)) {
-            throw ApiException.badRequest("Non puoi prenotare un orario già passato");
+            throw ApiException.badRequest("Non puoi prenotare una data già passata");
         }
 
         flash.setStatus(FlashStatus.PENDING);
@@ -95,11 +97,17 @@ public class BookingService {
         return bookingRepository.findByStatusOrderByCreatedAtDesc(status);
     }
 
+    /** Charlotte accetta e comunica l'orario preciso, che deve essere dentro la fascia scelta dal cliente. */
     @Transactional
-    public Booking accept(Long id) {
+    public Booking accept(Long id, LocalTime time) {
         Booking booking = getById(id);
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw ApiException.conflict("Questa richiesta è già stata gestita");
+        }
+        DayPeriod period = booking.getSlot().getPeriod();
+        if (!period.contains(time)) {
+            throw ApiException.badRequest("Il cliente ha scelto " + period.labelWithArticle() + ": scegli un orario tra le "
+                    + period.getStart() + " e le " + period.getEnd());
         }
         Flash flash = lockFlash(booking);
         AvailabilitySlot slot = lockSlot(booking);
@@ -107,6 +115,7 @@ public class BookingService {
         flash.setStatus(FlashStatus.UNAVAILABLE);
         slot.setStatus(SlotStatus.BOOKED);
         booking.setStatus(BookingStatus.ACCEPTED);
+        booking.setConfirmedTime(time);
         return booking;
     }
 
@@ -118,6 +127,7 @@ public class BookingService {
         }
         releaseFlashAndSlot(booking);
         booking.setStatus(BookingStatus.REJECTED);
+        booking.setConfirmedTime(null);
         booking.setRejectionReason(reason.trim());
         return booking;
     }

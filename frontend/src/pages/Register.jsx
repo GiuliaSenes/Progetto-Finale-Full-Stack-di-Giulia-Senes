@@ -13,6 +13,7 @@ export default function Register() {
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
   })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -26,12 +27,23 @@ export default function Register() {
     setForm({ ...form, [event.target.name]: event.target.value })
   }
 
+  // Mostriamo l'avviso mentre l'utente scrive, solo quando ha già compilato il secondo campo
+  const passwordsDiffer = form.confirmPassword !== '' && form.password !== form.confirmPassword
+
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
+
+    if (form.password !== form.confirmPassword) {
+      setError('Le due password non coincidono')
+      return
+    }
+
     setSubmitting(true)
     try {
-      await register(form)
+      // La conferma password serve solo qui: al backend non la mandiamo
+      const { confirmPassword, ...data } = form
+      await register(data)
       navigate('/gallery', { replace: true })
     } catch (err) {
       setError(err.message)
@@ -62,6 +74,7 @@ export default function Register() {
         <label>
           Email
           <input type="email" name="email" value={form.email} onChange={handleChange} autoComplete="email" required />
+          <small>Con questa email accederai al sito.</small>
         </label>
 
         <label>
@@ -81,6 +94,20 @@ export default function Register() {
             required
           />
           <small>Almeno 8 caratteri.</small>
+        </label>
+
+        <label>
+          Conferma password
+          <input
+            type="password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            autoComplete="new-password"
+            aria-invalid={passwordsDiffer}
+            required
+          />
+          {passwordsDiffer && <small className="field-error">Le due password non coincidono</small>}
         </label>
 
         <button className="btn" type="submit" disabled={submitting}>

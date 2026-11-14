@@ -11,8 +11,13 @@ import com.jayway.jsonpath.JsonPath;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 /** Test del flusso principale: registrazione, login, prenotazioni e doppia prenotazione. */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ExtendWith(OutputCaptureExtension.class)
 class ApiFlowTest {
 
     // Ogni test usa una data diversa, cosi' gli slot dei test non si pestano i piedi
@@ -147,9 +153,11 @@ class ApiFlowTest {
         long bookingId = bookingId(book(anna, flash, slot).andExpect(status().isCreated()).andReturn());
 
         mockMvc.perform(put("/api/admin/bookings/" + bookingId + "/accept")
-                        .header("Authorization", "Bearer " + admin))
+                        .header("Authorization", "Bearer " + admin)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"time\":\"10:30\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("ACCEPTED"));
+                .andExpect(jsonPath("$.status").value("ACCEPTED"))
+                .andExpect(jsonPath("$.confirmedTime").value("10:30:00"));
 
         // Accettata: nessun altro puo' prenotarla
         book(luca, flash, slot).andExpect(status().isConflict());
@@ -163,6 +171,68 @@ class ApiFlowTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CANCELLED"));
         book(luca, flash, slot).andExpect(status().isCreated());
+    }
+
+    @Test
+    void acceptNeedsATimeInsideTheChosenPeriod() throws Exception {
+        String admin = loginAdmin();
+        long flash = createFlash(admin);
+        long slot = createSlot(admin); // gli slot dei test sono sempre "mattina"
+        String anna = register(randomEmail());
+        long bookingId = bookingId(book(anna, flash, slot).andExpect(status().isCreated()).andReturn());
+
+        // Senza orario -> 400
+        mockMvc.perform(put("/api/admin/bookings/" + bookingId + "/accept")
+                        .header("Authorization", "Bearer " + admin)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest());
+
+        // Orario di pomeriggio per una richiesta di mattina -> 400
+        mockMvc.perform(put("/api/admin/bookings/" + bookingId + "/accept")
+                        .header("Authorization", "Bearer " + admin)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"time\":\"15:00\"}"))
+                .andExpect(status().isBadRequest());
+
+        // La richiesta e' ancora in attesa
+        mockMvc.perform(get("/api/bookings/mine").header("Authorization", "Bearer " + anna))
+                .andExpect(jsonPath("$[0].status").value("PENDING"));
+    }
+
+    @Test
+    void passwordCanBeResetWithTheLinkOnlyOnce(CapturedOutput output) throws Exception {
+        String email = randomEmail();
+        register(email);
+
+        // Stessa risposta anche per un'email che non esiste
+        mockMvc.perform(post("/api/auth/forgot-password").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"non-esiste@example.com\"}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/auth/forgot-password").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + email + "\"}"))
+                .andExpect(status().isOk());
+
+        // Il link finisce nel log del backend: ne estraiamo il token
+        Matcher matcher = Pattern.compile(email + ".*reset-password\\?token=([A-Za-z0-9_-]+)").matcher(output);
+        org.junit.jupiter.api.Assertions.assertTrue(matcher.find(), "link di reset non trovato nel log");
+        String token = matcher.group(1);
+
+        // Token sbagliato -> 400
+        mockMvc.perform(post("/api/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"sbagliato\",\"newPassword\":\"NuovaPass123\"}"))
+                .andExpect(status().isBadRequest());
+
+        // Token giusto -> password cambiata
+        mockMvc.perform(post("/api/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"" + token + "\",\"newPassword\":\"NuovaPass123\"}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + email + "\",\"password\":\"NuovaPass123\"}"))
+                .andExpect(status().isOk());
+
+        // Il link non si puo' riusare
+        mockMvc.perform(post("/api/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"" + token + "\",\"newPassword\":\"AltraPass123\"}"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -226,7 +296,7 @@ class ApiFlowTest {
 
     private long createSlot(String adminToken) throws Exception {
         LocalDate date = LocalDate.now().plusDays(DAY_COUNTER.incrementAndGet());
-        String json = "{\"date\":\"" + date + "\",\"startTimes\":[\"10:00\"]}";
+        String json = "{\"date\":\"" + date + "\",\"periods\":[\"MORNING\"]}";
         String body = mockMvc.perform(post("/api/admin/slots").header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isCreated())

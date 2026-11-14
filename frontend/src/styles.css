@@ -408,6 +408,14 @@ legend {
   padding: 0 0.4rem;
 }
 
+.field-error {
+  color: var(--error);
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--error);
+}
+
 .checkbox-label {
   flex-direction: row;
   align-items: center;
@@ -666,6 +674,12 @@ legend {
   color: var(--ink);
 }
 
+.slot-button small {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
 .slot-button:hover {
   border-color: var(--ink);
 }
@@ -713,6 +727,14 @@ legend {
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-bottom: 0.3rem;
+}
+
+.field-label {
+  margin: 0.5rem 0 0.1rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }
 
 .rejection {

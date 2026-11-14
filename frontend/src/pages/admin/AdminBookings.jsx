@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../../api'
 import Alert from '../../components/Alert'
 import StatusBadge from '../../components/StatusBadge'
-import { BOOKING_STATUS, formatDateTime, formatSlot } from '../../utils/format'
+import { BOOKING_STATUS, PERIOD_LABELS, formatBookingWhen, formatDateTime } from '../../utils/format'
 
 const FILTERS = [
   { value: 'PENDING', label: 'In attesa' },
@@ -19,7 +19,9 @@ export default function AdminBookings() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  // Id della richiesta per cui sto scrivendo il motivo del rifiuto
+  // Id della richiesta per cui sto scrivendo l'orario (accetta) o il motivo (rifiuta)
+  const [acceptingId, setAcceptingId] = useState(null)
+  const [time, setTime] = useState('')
   const [rejectingId, setRejectingId] = useState(null)
   const [reason, setReason] = useState('')
 
@@ -40,8 +42,10 @@ export default function AdminBookings() {
     setError('')
     setSuccess('')
     try {
-      await api.put(`/api/admin/bookings/${booking.id}/accept`)
-      setSuccess('Richiesta accettata: l\'orario è ora bloccato.')
+      await api.put(`/api/admin/bookings/${booking.id}/accept`, { time })
+      setSuccess('Richiesta accettata: il cliente vedrà l\'orario che hai scelto.')
+      setAcceptingId(null)
+      setTime('')
       await loadBookings()
     } catch (err) {
       setError(err.message)
@@ -93,12 +97,12 @@ export default function AdminBookings() {
                 <StatusBadge labels={BOOKING_STATUS} value={booking.status} />
               </div>
               <p>
-                Flash da {booking.flash.size} · {formatSlot(booking.slot)}
+                Flash da {booking.flash.size} · {formatBookingWhen(booking)}
               </p>
               <p className="muted">
                 {booking.customer.email} · {booking.customer.phone}
               </p>
-              {booking.note && <p className="muted">Nota: {booking.note}</p>}
+              {booking.note && <p className="muted">Messaggio del cliente: {booking.note}</p>}
               <p className="muted small">Richiesta del {formatDateTime(booking.createdAt)}</p>
               {booking.status === 'REJECTED' && (
                 <p className="rejection">
@@ -106,9 +110,15 @@ export default function AdminBookings() {
                 </p>
               )}
 
-              {booking.status === 'PENDING' && rejectingId !== booking.id && (
+              {booking.status === 'PENDING' && rejectingId !== booking.id && acceptingId !== booking.id && (
                 <div className="actions">
-                  <button className="btn btn-small" onClick={() => handleAccept(booking)}>
+                  <button
+                    className="btn btn-small"
+                    onClick={() => {
+                      setAcceptingId(booking.id)
+                      setTime('')
+                    }}
+                  >
                     Accetta
                   </button>
                   <button
@@ -120,6 +130,31 @@ export default function AdminBookings() {
                   >
                     Rifiuta
                   </button>
+                </div>
+              )}
+
+              {acceptingId === booking.id && (
+                <div className="reject-box">
+                  <label>
+                    Orario dell'appuntamento ({PERIOD_LABELS[booking.slot.period].toLowerCase()}, il cliente lo vedrà
+                    nella conferma)
+                    <input
+                      type="time"
+                      value={time}
+                      min={booking.slot.period === 'MORNING' ? '09:00' : '13:00'}
+                      max={booking.slot.period === 'MORNING' ? '12:59' : '19:59'}
+                      onChange={(e) => setTime(e.target.value)}
+                      required
+                    />
+                  </label>
+                  <div className="actions">
+                    <button className="btn btn-small" disabled={!time} onClick={() => handleAccept(booking)}>
+                      Conferma
+                    </button>
+                    <button className="btn btn-small btn-outline" onClick={() => setAcceptingId(null)}>
+                      Annulla
+                    </button>
+                  </div>
                 </div>
               )}
 

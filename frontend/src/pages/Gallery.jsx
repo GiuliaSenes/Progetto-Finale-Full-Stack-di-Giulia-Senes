@@ -25,7 +25,7 @@ export default function Gallery() {
     <main className="container">
       <h1>I flash di Charlotte</h1>
       <p className="subtitle">
-        Disegni pronti da tatuare, ognuno una sola volta. Scegli quello che ti piace e prenota il tuo orario.
+        Disegni pronti da tatuare, ognuno una sola volta. Scegli quello che ti piace e prenota il tuo giorno.
       </p>
 
       <label className="checkbox-label">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../../api'
 import Alert from '../../components/Alert'
 import StatusBadge from '../../components/StatusBadge'
-import { SLOT_STATUS, SLOT_TIMES, formatDate, formatTime, toDateKey } from '../../utils/format'
+import { PERIODS, PERIOD_LABELS, SLOT_STATUS, formatDate, toDateKey } from '../../utils/format'
 
 export default function AdminSlots() {
   const [slots, setSlots] = useState([])
@@ -11,7 +11,7 @@ export default function AdminSlots() {
   const [success, setSuccess] = useState('')
 
   const [date, setDate] = useState('')
-  const [selectedTimes, setSelectedTimes] = useState([]) // es. ['10:00', '15:00']
+  const [selectedPeriods, setSelectedPeriods] = useState([]) // es. ['MORNING', 'AFTERNOON']
 
   function loadSlots() {
     return api
@@ -24,12 +24,12 @@ export default function AdminSlots() {
     loadSlots().finally(() => setLoading(false))
   }, [])
 
-  // Aggiunge o toglie una fascia oraria dalla selezione
-  function toggleTime(start) {
-    if (selectedTimes.includes(start)) {
-      setSelectedTimes(selectedTimes.filter((time) => time !== start))
+  // Aggiunge o toglie mattina/pomeriggio dalla selezione
+  function togglePeriod(period) {
+    if (selectedPeriods.includes(period)) {
+      setSelectedPeriods(selectedPeriods.filter((p) => p !== period))
     } else {
-      setSelectedTimes([...selectedTimes, start])
+      setSelectedPeriods([...selectedPeriods, period])
     }
   }
 
@@ -38,13 +38,9 @@ export default function AdminSlots() {
     setError('')
     setSuccess('')
     try {
-      const created = await api.post('/api/admin/slots', { date, startTimes: selectedTimes })
-      setSuccess(
-        created.length === 0
-          ? 'Queste fasce esistevano già.'
-          : `Disponibilità aggiunta (${created.length} ${created.length === 1 ? 'fascia' : 'fasce'}).`,
-      )
-      setSelectedTimes([])
+      const created = await api.post('/api/admin/slots', { date, periods: selectedPeriods })
+      setSuccess(created.length === 0 ? 'Questa disponibilità esisteva già.' : 'Disponibilità aggiunta.')
+      setSelectedPeriods([])
       await loadSlots()
     } catch (err) {
       setError(err.message)
@@ -56,7 +52,7 @@ export default function AdminSlots() {
     setSuccess('')
     try {
       await api.delete(`/api/admin/slots/${slot.id}`)
-      setSuccess('Fascia eliminata.')
+      setSuccess('Disponibilità eliminata.')
       await loadSlots()
     } catch (err) {
       setError(err.message)
@@ -89,23 +85,27 @@ export default function AdminSlots() {
         </label>
 
         <fieldset>
-          <legend>Fasce orarie (2 ore ciascuna)</legend>
+          <legend>Quando sei disponibile?</legend>
           <div className="slot-list">
-            {SLOT_TIMES.map((time) => (
+            {PERIODS.map((period) => (
               <button
-                key={time.start}
+                key={period.value}
                 type="button"
-                className={`slot-button ${selectedTimes.includes(time.start) ? 'selected' : ''}`}
-                onClick={() => toggleTime(time.start)}
-                aria-pressed={selectedTimes.includes(time.start)}
+                className={`slot-button ${selectedPeriods.includes(period.value) ? 'selected' : ''}`}
+                onClick={() => togglePeriod(period.value)}
+                aria-pressed={selectedPeriods.includes(period.value)}
               >
-                {time.label}
+                {period.label}
+                <small>{period.hint}</small>
               </button>
             ))}
           </div>
+          <p className="muted small">
+            Il cliente sceglie solo mattina o pomeriggio: l'orario preciso lo decidi tu quando accetti la richiesta.
+          </p>
         </fieldset>
 
-        <button className="btn" type="submit" disabled={!date || selectedTimes.length === 0}>
+        <button className="btn" type="submit" disabled={!date || selectedPeriods.length === 0}>
           Aggiungi
         </button>
       </form>
@@ -114,7 +114,6 @@ export default function AdminSlots() {
       <Alert>{error}</Alert>
       {loading && <p className="page-message">Caricamento...</p>}
       {!loading && slots.length === 0 && <p className="muted">Non hai ancora aggiunto nessuna disponibilità.</p>}
-
       <div className="list">
         {Object.entries(slotsByDate).map(([day, daySlots]) => (
           <article key={day} className="card">
@@ -122,9 +121,7 @@ export default function AdminSlots() {
             <ul className="slot-rows">
               {daySlots.map((slot) => (
                 <li key={slot.id}>
-                  <span>
-                    {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
-                  </span>
+                  <span>{PERIOD_LABELS[slot.period]}</span>
                   <StatusBadge labels={SLOT_STATUS} value={slot.status} />
                   {slot.status === 'FREE' ? (
                     <button className="btn btn-small btn-outline" onClick={() => handleDelete(slot)}>

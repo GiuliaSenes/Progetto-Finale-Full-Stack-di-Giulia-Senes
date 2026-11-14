@@ -3,7 +3,13 @@ import { Link, useLocation } from 'react-router-dom'
 import { api } from '../api'
 import Alert from '../components/Alert'
 import StatusBadge from '../components/StatusBadge'
-import { BOOKING_STATUS, CONSULTATION_STATUS, formatDateTime, formatSlot } from '../utils/format'
+import {
+  BOOKING_STATUS,
+  CONSULTATION_STATUS_CLIENT,
+  formatBookingWhen,
+  formatDateTime,
+  formatTime,
+} from '../utils/format'
 
 export default function MyBookings() {
   const location = useLocation()
@@ -69,8 +75,11 @@ export default function MyBookings() {
                     <strong>Flash da {booking.flash.size}</strong>
                     <StatusBadge labels={BOOKING_STATUS} value={booking.status} />
                   </div>
-                  <p>{formatSlot(booking.slot)}</p>
-                  {booking.note && <p className="muted">Nota: {booking.note}</p>}
+                  <p>{formatBookingWhen(booking)}</p>
+                  {booking.status === 'PENDING' && (
+                    <p className="muted small">Orario da definire: te lo confermerà Charlotte.</p>
+                  )}
+                  {booking.note && <p className="muted">Il tuo messaggio: {booking.note}</p>}
                   <p className="muted small">Inviata il {formatDateTime(booking.createdAt)}</p>
 
                   {booking.status === 'REJECTED' && (
@@ -79,7 +88,10 @@ export default function MyBookings() {
                     </p>
                   )}
                   {booking.status === 'ACCEPTED' && (
-                    <p className="accepted-note">Charlotte ti aspetta! Se non puoi venire, annulla la richiesta.</p>
+                    <p className="accepted-note">
+                      Richiesta accettata! Charlotte ti aspetta alle {formatTime(booking.confirmedTime)}. Se non puoi
+                      venire, annulla la richiesta.
+                    </p>
                   )}
 
                   {canCancel(booking) && (
@@ -103,13 +115,17 @@ export default function MyBookings() {
               <article key={c.id} className="card list-item">
                 <div className="list-item-body">
                   <div className="list-item-head">
-                    <strong>Consulenza del {formatDateTime(c.createdAt)}</strong>
-                    <StatusBadge labels={CONSULTATION_STATUS} value={c.status} />
+                    <strong>Richiesta di consulenza inviata</strong>
+                    <StatusBadge labels={CONSULTATION_STATUS_CLIENT} value={c.status} />
                   </div>
+                  <p className="muted small">Il {formatDateTime(c.createdAt)}</p>
+                  <p className="field-label">Il tuo messaggio</p>
                   <p className="pre-line">{c.message}</p>
-                  {c.status === 'HANDLED' && (
-                    <p className="muted small">Charlotte ha preso in carico la richiesta e ti contatterà.</p>
-                  )}
+                  <p className="muted small">
+                    {c.status === 'HANDLED'
+                      ? 'Charlotte ha preso in carico la richiesta e ti contatterà.'
+                      : 'Charlotte la leggerà e ti contatterà via email o telefono.'}
+                  </p>
                 </div>
               </article>
             ))}

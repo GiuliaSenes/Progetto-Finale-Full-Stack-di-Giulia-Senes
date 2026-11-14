@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /** Richiesta di prenotazione: un cliente, un flash, uno slot. */
 @Entity
@@ -37,6 +38,9 @@ public class Booking {
     @Column(nullable = false)
     private BookingStatus status = BookingStatus.PENDING;
 
+    // Orario preciso, deciso da Charlotte quando accetta (prima è vuoto)
+    private LocalTime confirmedTime;
+
     // Spiegazione di Charlotte quando rifiuta
     @Column(length = 500)
     private String rejectionReason;
@@ -61,6 +65,9 @@ public class Booking {
 
     public BookingStatus getStatus() { return status; }
     public void setStatus(BookingStatus status) { this.status = status; }
+
+    public LocalTime getConfirmedTime() { return confirmedTime; }
+    public void setConfirmedTime(LocalTime confirmedTime) { this.confirmedTime = confirmedTime; }
 
     public String getRejectionReason() { return rejectionReason; }
     public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }

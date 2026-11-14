@@ -1,6 +1,7 @@
 package com.charlottetattoo.api.config;
 
 import com.charlottetattoo.api.model.AvailabilitySlot;
+import com.charlottetattoo.api.model.DayPeriod;
 import com.charlottetattoo.api.model.Flash;
 import com.charlottetattoo.api.model.FlashStatus;
 import com.charlottetattoo.api.model.Role;
@@ -10,11 +11,9 @@ import com.charlottetattoo.api.repository.FlashRepository;
 import com.charlottetattoo.api.repository.SlotRepository;
 import com.charlottetattoo.api.repository.UserRepository;
 import com.charlottetattoo.api.service.FileStorageService;
-import com.charlottetattoo.api.service.SlotService;
 import java.io.InputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
@@ -107,11 +106,10 @@ public class DataInitializer implements CommandLineRunner {
             if (day == DayOfWeek.SUNDAY || day == DayOfWeek.MONDAY) {
                 continue;
             }
-            for (LocalTime start : SlotService.ALLOWED_START_TIMES) {
+            for (DayPeriod period : DayPeriod.values()) {
                 AvailabilitySlot slot = new AvailabilitySlot();
                 slot.setDate(date);
-                slot.setStartTime(start);
-                slot.setEndTime(start.plusHours(SlotService.SLOT_HOURS));
+                slot.setPeriod(period);
                 slot.setStatus(SlotStatus.FREE);
                 slotRepository.save(slot);
             }
