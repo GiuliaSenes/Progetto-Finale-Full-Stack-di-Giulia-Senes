@@ -551,6 +551,7 @@ legend {
 }
 
 .booking-flash img {
+  max-width: 220px;
   background: #fff;
   border-radius: var(--radius);
   padding: 0.5rem;
