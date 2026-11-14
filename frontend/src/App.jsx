@@ -37,11 +37,13 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/aftercare" element={<Aftercare />} />
 
-        {/* Pagine per utenti loggati */}
-        <Route path="/gallery" element={<ProtectedRoute><Gallery /></ProtectedRoute>} />
-        <Route path="/booking/:flashId" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
-        <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
-        <Route path="/consultation" element={<ProtectedRoute><Consultation /></ProtectedRoute>} />
+        {/* Pagine per i clienti loggati (Charlotte viene rimandata al pannello) */}
+        <Route path="/gallery" element={<ProtectedRoute customerOnly><Gallery /></ProtectedRoute>} />
+        <Route path="/booking/:flashId" element={<ProtectedRoute customerOnly><Booking /></ProtectedRoute>} />
+        <Route path="/my-bookings" element={<ProtectedRoute customerOnly><MyBookings /></ProtectedRoute>} />
+        <Route path="/consultation" element={<ProtectedRoute customerOnly><Consultation /></ProtectedRoute>} />
+
+        {/* Profilo: per tutti gli utenti loggati */}
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
         {/* Solo per Charlotte (ruolo ADMIN) */}

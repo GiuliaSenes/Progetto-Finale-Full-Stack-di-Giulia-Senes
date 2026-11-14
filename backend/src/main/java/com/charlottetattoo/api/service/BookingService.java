@@ -8,6 +8,7 @@ import com.charlottetattoo.api.model.BookingStatus;
 import com.charlottetattoo.api.model.DayPeriod;
 import com.charlottetattoo.api.model.Flash;
 import com.charlottetattoo.api.model.FlashStatus;
+import com.charlottetattoo.api.model.Role;
 import com.charlottetattoo.api.model.SlotStatus;
 import com.charlottetattoo.api.model.User;
 import com.charlottetattoo.api.repository.BookingRepository;
@@ -45,6 +46,11 @@ public class BookingService {
 
     @Transactional
     public Booking create(User user, BookingRequest request) {
+        // Charlotte riceve le richieste, non le fa
+        if (user.getRole() == Role.ADMIN) {
+            throw ApiException.forbidden("Charlotte non può prenotare: gestisce le richieste dal pannello");
+        }
+
         // Limite di richieste in attesa per cliente, cosi' nessuno blocca tutta la galleria
         long pending = bookingRepository.countByUserAndStatus(user, BookingStatus.PENDING);
         if (pending >= maxPendingBookings) {

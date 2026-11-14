@@ -236,6 +236,19 @@ class ApiFlowTest {
     }
 
     @Test
+    void adminCannotBookOrAskForConsultations() throws Exception {
+        String admin = loginAdmin();
+        long flash = createFlash(admin);
+        long slot = createSlot(admin);
+
+        book(admin, flash, slot).andExpect(status().isForbidden());
+
+        mockMvc.perform(multipart("/api/consultations").param("message", "ciao")
+                        .header("Authorization", "Bearer " + admin))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void userCannotHaveTooManyPendingRequests() throws Exception {
         String admin = loginAdmin();
         String anna = register(randomEmail());

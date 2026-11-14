@@ -37,11 +37,15 @@ export default function Navbar() {
 
           {user && (
             <>
-              <NavLink to="/gallery" onClick={closeMenu}>Flash</NavLink>
-              <NavLink to="/consultation" onClick={closeMenu}>Consulenza</NavLink>
-              <NavLink to="/my-bookings" onClick={closeMenu}>Le mie richieste</NavLink>
-              {user.role === 'ADMIN' && (
+              {/* Charlotte (admin) riceve le richieste: non sceglie flash e non prenota */}
+              {user.role === 'ADMIN' ? (
                 <NavLink to="/admin" onClick={closeMenu}>Pannello</NavLink>
+              ) : (
+                <>
+                  <NavLink to="/gallery" onClick={closeMenu}>Flash</NavLink>
+                  <NavLink to="/consultation" onClick={closeMenu}>Consulenza</NavLink>
+                  <NavLink to="/my-bookings" onClick={closeMenu}>Le mie richieste</NavLink>
+                </>
               )}
               <NavLink to="/profile" onClick={closeMenu}>Profilo</NavLink>
               <button className="btn btn-small btn-outline" onClick={handleLogout}>

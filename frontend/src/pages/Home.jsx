@@ -10,6 +10,7 @@ const STEPS = [
 
 export default function Home() {
   const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
 
   return (
     <main>
@@ -22,12 +23,18 @@ export default function Home() {
             miei flash disponibili, prenota il tuo orario e vieni a farti tatuare.
           </p>
           <div className="hero-actions">
-            <Link to={user ? '/gallery' : '/register'} className="btn">
-              {user ? 'Vedi i flash disponibili' : 'Registrati per prenotare'}
-            </Link>
-            <Link to={user ? '/consultation' : '/login'} className="btn btn-outline">
-              {user ? 'Richiedi una consulenza' : 'Accedi'}
-            </Link>
+            {isAdmin ? (
+              <Link to="/admin" className="btn">Vai al pannello</Link>
+            ) : (
+              <>
+                <Link to={user ? '/gallery' : '/register'} className="btn">
+                  {user ? 'Vedi i flash disponibili' : 'Registrati per prenotare'}
+                </Link>
+                <Link to={user ? '/consultation' : '/login'} className="btn btn-outline">
+                  {user ? 'Richiedi una consulenza' : 'Accedi'}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -60,9 +67,11 @@ export default function Home() {
             Se non trovi il disegno giusto puoi richiedere una consulenza: raccontami la tua idea,
             allega un'immagine di riferimento e ci mettiamo d'accordo su come realizzarla.
           </p>
-          <Link to={user ? '/consultation' : '/login'} className="text-link">
-            Richiedi una consulenza →
-          </Link>
+          {!isAdmin && (
+            <Link to={user ? '/consultation' : '/login'} className="text-link">
+              Richiedi una consulenza →
+            </Link>
+          )}
         </div>
       </section>
 

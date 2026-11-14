@@ -3,6 +3,7 @@ package com.charlottetattoo.api.service;
 import com.charlottetattoo.api.exception.ApiException;
 import com.charlottetattoo.api.model.Consultation;
 import com.charlottetattoo.api.model.ConsultationStatus;
+import com.charlottetattoo.api.model.Role;
 import com.charlottetattoo.api.model.User;
 import com.charlottetattoo.api.repository.ConsultationRepository;
 import java.util.List;
@@ -22,6 +23,10 @@ public class ConsultationService {
     }
 
     public Consultation create(User user, String message, MultipartFile referenceImage) {
+        // Le consulenze si richiedono a Charlotte: lei non può richiederle a se stessa
+        if (user.getRole() == Role.ADMIN) {
+            throw ApiException.forbidden("Charlotte non può richiedere una consulenza");
+        }
         if (message == null || message.isBlank()) {
             throw ApiException.badRequest("Descrivi la tua idea di tatuaggio");
         }
