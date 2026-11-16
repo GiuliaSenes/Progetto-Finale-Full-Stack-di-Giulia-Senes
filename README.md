@@ -59,15 +59,9 @@ prossime 4 settimane. Il database è un file in `backend/data/` (non serve insta
 caricate finiscono in `backend/uploads/`. Per ripartire da zero basta cancellare queste due cartelle
 (da fare anche dopo un aggiornamento che cambia la struttura del database).
 
-### Account di prova
 
-| Ruolo | Email | Password |
-|-------|-------|----------|
-| Charlotte (admin) | `charlotte@charlottetattoo.it` | `Charlotte2025!` |
-| Cliente | si crea dalla pagina "Registrati" | a scelta (min. 8 caratteri) |
 
-Le credenziali dell'admin si cambiano in `backend/src/main/resources/application.properties`.
-In un sito vero il segreto JWT e la password admin vanno messi in variabili d'ambiente.
+
 
 ## Funzionalità
 
