@@ -1,18 +1,20 @@
 /* ---------- Variabili: i colori e i font del sito ---------- */
 :root {
-  --bg: #f7f3ee;
-  --surface: #fffdf9;
-  --ink: #1f1b18;
-  --muted: #6f655c;
-  --line: #ddd3c7;
-  --accent: #8c5a43;
-  --accent-dark: #6f4432;
-  --success-bg: #e8f1e6;
-  --success: #2f5d34;
-  --error-bg: #f8e6e2;
-  --error: #8a2f1f;
-  --warning-bg: #f7ecd5;
-  --warning: #7a5a12;
+  /* Palette neutra, marrone caldo */
+  --bg: #f1e8dd;
+  --surface: #faf4eb;
+  --paper: #fffaf2;
+  --ink: #2e231c;
+  --muted: #7b6a5c;
+  --line: #dac9b6;
+  --accent: #9b6a4a;
+  --accent-dark: #744c33;
+  --success-bg: #e6ecd8;
+  --success: #3d5a2e;
+  --error-bg: #f3dfd5;
+  --error: #8a3a24;
+  --warning-bg: #f4e5c8;
+  --warning: #7a5512;
   --radius: 6px;
   --font-title: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -164,8 +166,8 @@ img {
 .navbar {
   background: var(--surface);
   border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
+  /* Non resta fisso in alto: il logo è alto e occuperebbe troppo spazio mentre si scorre */
+  position: relative;
   z-index: 10;
 }
 
@@ -190,6 +192,13 @@ img {
 .brand span {
   font-style: italic;
   color: var(--accent);
+}
+
+/* Il logo "Hot Babe Hot Tattoos" (originale, con il corsivo) al posto della scritta */
+.brand img {
+  display: block;
+  height: 92px;
+  width: auto;
 }
 
 .nav-links {
@@ -275,12 +284,33 @@ img {
 
 .hero-inner {
   padding-bottom: 0;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 2.5rem;
+  align-items: center;
 }
 
 .hero h1 {
   max-width: 14ch;
   font-size: clamp(2.6rem, 7vw, 4.6rem);
   margin-top: 0;
+}
+
+/* La foto non ha cornice: il bianco della pelle prende il colore dello sfondo (multiply)
+   e i bordi sfumano piano (mask), così il tatuaggio "galleggia" sulla pagina */
+.hero-art {
+  width: 100%;
+  max-width: 440px;
+  justify-self: center;
+}
+
+.hero-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 58%, transparent 92%);
+  mask-image: radial-gradient(circle closest-side, #000 58%, transparent 92%);
 }
 
 .hero-text {
@@ -381,13 +411,13 @@ select {
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--paper);
   color: var(--ink);
   width: 100%;
 }
 
 input:disabled {
-  background: #f1ece5;
+  background: #e9ddce;
   color: var(--muted);
 }
 
@@ -406,6 +436,33 @@ legend {
   font-size: 0.9rem;
   font-weight: 500;
   padding: 0 0.4rem;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 2.8rem;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.4rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0.35rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--ink);
 }
 
 .field-error {
@@ -478,7 +535,7 @@ input[aria-invalid='true'] {
 }
 
 .badge-cancelled {
-  background: #ece7e1;
+  background: #e7dccf;
   color: var(--muted);
 }
 
@@ -501,7 +558,7 @@ input[aria-invalid='true'] {
 
 .flash-image {
   aspect-ratio: 1;
-  background: #fff;
+  background: var(--paper);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -560,7 +617,7 @@ input[aria-invalid='true'] {
 
 .booking-flash img {
   max-width: 220px;
-  background: #fff;
+  background: var(--paper);
   border-radius: var(--radius);
   padding: 0.5rem;
 }
@@ -635,14 +692,14 @@ input[aria-invalid='true'] {
   background: none;
   font-family: var(--font-body);
   font-size: 0.9rem;
-  color: #b9afa4;
+  color: #bcab99;
   cursor: not-allowed;
 }
 
 .calendar-day.available {
   color: var(--ink);
   border-color: var(--line);
-  background: #fff;
+  background: var(--paper);
   cursor: pointer;
   font-weight: 500;
 }
@@ -664,7 +721,7 @@ input[aria-invalid='true'] {
 }
 
 .slot-button {
-  background: #fff;
+  background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 0.55rem 1rem;
@@ -708,7 +765,7 @@ input[aria-invalid='true'] {
   width: 96px;
   height: 96px;
   object-fit: contain;
-  background: #fff;
+  background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 0.3rem;
@@ -812,7 +869,7 @@ input[aria-invalid='true'] {
 }
 
 .chip {
-  background: #fff;
+  background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.3rem 0.9rem;
@@ -869,6 +926,28 @@ input[aria-invalid='true'] {
   margin: 0;
 }
 
+.footer-logo {
+  display: block;
+  width: 120px;
+  height: auto;
+  margin: 0 auto 0.8rem;
+}
+
+/* Orsacchiotti di sfondo nella pagina FAQ: fissi, dietro al testo, non cliccabili */
+.bears-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bears-bg img {
+  position: absolute;
+  height: auto;
+  opacity: 0.55;
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 800px) {
   .menu-toggle {
@@ -889,8 +968,18 @@ input[aria-invalid='true'] {
   }
 
   .two-columns,
-  .booking-layout {
+  .booking-layout,
+  .hero-inner {
     grid-template-columns: 1fr;
+  }
+
+  .hero-art {
+    max-width: 340px;
+    margin-top: 0.5rem;
+  }
+
+  .brand img {
+    height: 72px;
   }
 
   .steps {

@@ -1,4 +1,5 @@
-import { Link, Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes, useLocation } from 'react-router-dom'
+import BearsBackground from './components/BearsBackground'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
@@ -25,8 +26,12 @@ function NotFound() {
 }
 
 export default function App() {
+  // Gli orsacchiotti di sfondo ci sono in tutte le pagine tranne la home
+  const { pathname } = useLocation()
+
   return (
     <>
+      {pathname !== '/' && <BearsBackground />}
       <Navbar />
       <Routes>
         {/* Pagine pubbliche */}
@@ -52,7 +57,8 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <footer className="footer">
-        <p>© {new Date().getFullYear()} Charlotte Tattoo · Flash fine line e microrealismo</p>
+        <img className="footer-logo" src="/img/logo-full.png" alt="Hot Babe Hot Tattoos by Tottapiga" width="345" height="304" />
+        <p>© {new Date().getFullYear()} Charlotte Tattoo · Fine line e microrealismo</p>
       </footer>
     </>
   )

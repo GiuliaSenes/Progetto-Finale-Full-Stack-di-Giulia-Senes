@@ -248,6 +248,51 @@ class ApiFlowTest {
                 .andExpect(status().isForbidden());
     }
 
+    // ---------- FAQ ----------
+
+    @Test
+    void faqsArePublicAndOnlyAdminCanEditThem() throws Exception {
+        // Si leggono anche senza login, e ci sono quelle iniziali
+        mockMvc.perform(get("/api/faqs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].question").isNotEmpty());
+
+        String admin = loginAdmin();
+        String user = register(randomEmail());
+        String json = "{\"question\":\"Domanda di prova?\",\"answer\":\"Risposta di prova.\"}";
+
+        // Un cliente non puo' aggiungere FAQ
+        mockMvc.perform(post("/api/admin/faqs").header("Authorization", "Bearer " + user)
+                        .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isForbidden());
+
+        // Domanda vuota -> 400
+        mockMvc.perform(post("/api/admin/faqs").header("Authorization", "Bearer " + admin)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"question\":\"\",\"answer\":\"x\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Scrivi la domanda"));
+
+        // Charlotte crea, modifica ed elimina
+        String body = mockMvc.perform(post("/api/admin/faqs").header("Authorization", "Bearer " + admin)
+                        .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long id = ((Number) JsonPath.read(body, "$.id")).longValue();
+
+        mockMvc.perform(put("/api/admin/faqs/" + id).header("Authorization", "Bearer " + admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"question\":\"Domanda modificata?\",\"answer\":\"Nuova risposta.\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.question").value("Domanda modificata?"));
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .delete("/api/admin/faqs/" + id).header("Authorization", "Bearer " + admin))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .delete("/api/admin/faqs/" + id).header("Authorization", "Bearer " + admin))
+                .andExpect(status().isNotFound());
+    }
+
     @Test
     void userCannotHaveTooManyPendingRequests() throws Exception {
         String admin = loginAdmin();

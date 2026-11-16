@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import Alert from '../components/Alert'
+import PasswordInput from '../components/PasswordInput'
 import { useAuth } from '../context/AuthContext'
 
 export default function Register() {
@@ -84,8 +85,7 @@ export default function Register() {
 
         <label>
           Password
-          <input
-            type="password"
+          <PasswordInput
             name="password"
             value={form.password}
             onChange={handleChange}
@@ -98,8 +98,7 @@ export default function Register() {
 
         <label>
           Conferma password
-          <input
-            type="password"
+          <PasswordInput
             name="confirmPassword"
             value={form.confirmPassword}
             onChange={handleChange}

@@ -19,8 +19,8 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <Link to="/" className="brand" onClick={closeMenu}>
-          Charlotte <span>tattoo</span>
+        <Link to="/" className="brand" onClick={closeMenu} aria-label="Charlotte Tattoo - vai alla home">
+          <img src="/img/logo-full.png" alt="Hot Babe Hot Tattoos by Tottapiga" width="342" height="304" />
         </Link>
 
         <button

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api } from '../api'
 import Alert from '../components/Alert'
+import PasswordInput from '../components/PasswordInput'
 import { useAuth } from '../context/AuthContext'
 
 export default function Profile() {
@@ -102,8 +103,7 @@ export default function Profile() {
 
         <label>
           Password attuale
-          <input
-            type="password"
+          <PasswordInput
             value={passwords.currentPassword}
             onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
             autoComplete="current-password"
@@ -113,8 +113,7 @@ export default function Profile() {
 
         <label>
           Nuova password
-          <input
-            type="password"
+          <PasswordInput
             value={passwords.newPassword}
             onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
             autoComplete="new-password"
@@ -126,8 +125,7 @@ export default function Profile() {
 
         <label>
           Conferma nuova password
-          <input
-            type="password"
+          <PasswordInput
             value={passwords.confirmPassword}
             onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
             autoComplete="new-password"

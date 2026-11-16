@@ -1,3 +1,8 @@
+import { useEffect, useState } from 'react'
+import { api } from '../api'
+import Alert from '../components/Alert'
+
+// Consigli per la cura del tatuaggio: testo fisso
 const AFTERCARE = [
   {
     title: 'Le prime 24 ore',
@@ -21,63 +26,20 @@ const AFTERCARE = [
   },
 ]
 
-const FAQ = [
-  {
-    question: 'Come funziona la prenotazione?',
-    answer:
-      "Scegli un flash dalla galleria, scegli un giorno e se preferisci la mattina o il pomeriggio, poi invia la richiesta. Charlotte la riceve e può accettarla, comunicandoti l'orario preciso, oppure rifiutarla (in quel caso ti scrive il motivo). Puoi seguire lo stato nella pagina \"Le mie richieste\".",
-  },
-  {
-    question: 'Cosa significa "in attesa di conferma"?',
-    answer:
-      "Quando qualcuno invia una richiesta, il flash e la giornata scelti vengono bloccati finché Charlotte non risponde. In questo modo non possono esserci due prenotazioni sullo stesso flash. Se la richiesta viene rifiutata o annullata, tornano subito disponibili.",
-  },
-  {
-    question: "Quando scopro l'orario preciso?",
-    answer:
-      "Tu scegli solo il giorno e se preferisci mattina o pomeriggio. L'orario esatto te lo comunica Charlotte quando accetta la richiesta: lo trovi nella pagina \"Le mie richieste\".",
-  },
-  {
-    question: 'Dove sul corpo faccio il tatuaggio?',
-    answer:
-      'La zona del corpo si decide insieme a Charlotte, che ti consiglia il punto migliore per il disegno che hai scelto.',
-  },
-  {
-    question: 'Quanto dura un tatuaggio flash?',
-    answer: 'Ogni appuntamento dura al massimo 2 ore, perché i flash sono disegni piccoli e veloci da realizzare.',
-  },
-  {
-    question: 'Ho dimenticato la password: cosa faccio?',
-    answer:
-      'Dalla pagina di accesso clicca su "Hai dimenticato la password?" e segui il link per sceglierne una nuova. Per accedere si usa sempre la tua email.',
-  },
-  {
-    question: 'Posso modificare un flash?',
-    answer:
-      'I flash si tatuano come sono stati disegnati. Se vuoi qualcosa di personalizzato, usa il modulo "Consulenza" e racconta la tua idea a Charlotte.',
-  },
-  {
-    question: 'Posso annullare una richiesta?',
-    answer:
-      'Sì, dalla pagina "Le mie richieste" puoi annullare le richieste in attesa o già accettate. Se non puoi più venire, annulla il prima possibile così il posto torna libero per qualcun altro.',
-  },
-  {
-    question: 'Serve essere maggiorenni?',
-    answer: 'Sì. Per tatuarsi è necessario essere maggiorenni.',
-  },
-  {
-    question: 'Quanto costa?',
-    answer:
-      'Il prezzo dipende dalle dimensioni e dal disegno. Charlotte ti darà tutte le informazioni quando risponde alla tua richiesta.',
-  },
-  {
-    question: 'Come funziona la consulenza?',
-    answer:
-      "Compili il modulo con la tua idea e, se vuoi, allegando un'immagine di riferimento. Charlotte lo legge e ti contatta via email o telefono per accordarsi sui dettagli.",
-  },
-]
-
 export default function Aftercare() {
+  // Le FAQ arrivano dal database: le gestisce Charlotte dal suo pannello
+  const [faqs, setFaqs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    api
+      .get('/api/faqs')
+      .then(setFaqs)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
   return (
     <main className="container narrow-wide">
       <h1>Aftercare e FAQ</h1>
@@ -97,11 +59,14 @@ export default function Aftercare() {
 
       <section className="section-small">
         <h2>Domande frequenti</h2>
+        <Alert>{error}</Alert>
+        {loading && <p className="page-message">Caricamento...</p>}
+        {!loading && !error && faqs.length === 0 && <p className="muted">Nessuna domanda al momento.</p>}
         <div className="faq">
-          {FAQ.map((item) => (
-            <details key={item.question}>
+          {faqs.map((item) => (
+            <details key={item.id}>
               <summary>{item.question}</summary>
-              <p>{item.answer}</p>
+              <p className="pre-line">{item.answer}</p>
             </details>
           ))}
         </div>

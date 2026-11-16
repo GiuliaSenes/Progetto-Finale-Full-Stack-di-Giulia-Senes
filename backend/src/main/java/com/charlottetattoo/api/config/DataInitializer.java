@@ -2,11 +2,13 @@ package com.charlottetattoo.api.config;
 
 import com.charlottetattoo.api.model.AvailabilitySlot;
 import com.charlottetattoo.api.model.DayPeriod;
+import com.charlottetattoo.api.model.Faq;
 import com.charlottetattoo.api.model.Flash;
 import com.charlottetattoo.api.model.FlashStatus;
 import com.charlottetattoo.api.model.Role;
 import com.charlottetattoo.api.model.SlotStatus;
 import com.charlottetattoo.api.model.User;
+import com.charlottetattoo.api.repository.FaqRepository;
 import com.charlottetattoo.api.repository.FlashRepository;
 import com.charlottetattoo.api.repository.SlotRepository;
 import com.charlottetattoo.api.repository.UserRepository;
@@ -33,19 +35,21 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final FlashRepository flashRepository;
     private final SlotRepository slotRepository;
+    private final FaqRepository faqRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileStorageService fileStorageService;
     private final String adminEmail;
     private final String adminPassword;
 
     public DataInitializer(UserRepository userRepository, FlashRepository flashRepository,
-                           SlotRepository slotRepository, PasswordEncoder passwordEncoder,
-                           FileStorageService fileStorageService,
+                           SlotRepository slotRepository, FaqRepository faqRepository,
+                           PasswordEncoder passwordEncoder, FileStorageService fileStorageService,
                            @Value("${app.admin.email}") String adminEmail,
                            @Value("${app.admin.password}") String adminPassword) {
         this.userRepository = userRepository;
         this.flashRepository = flashRepository;
         this.slotRepository = slotRepository;
+        this.faqRepository = faqRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileStorageService = fileStorageService;
         this.adminEmail = adminEmail;
@@ -57,6 +61,57 @@ public class DataInitializer implements CommandLineRunner {
         createAdmin();
         createDemoFlashes();
         createDemoSlots();
+        createDefaultFaqs();
+    }
+
+    // Domande di partenza: poi Charlotte le modifica dal pannello
+    private void createDefaultFaqs() {
+        if (faqRepository.count() > 0) {
+            return;
+        }
+        String[][] faqs = {
+                {"Come funziona la prenotazione?",
+                        "Scegli un flash dalla galleria, scegli un giorno e se preferisci la mattina o il pomeriggio, "
+                                + "poi invia la richiesta. Charlotte la riceve e può accettarla, comunicandoti l'orario "
+                                + "preciso, oppure rifiutarla (in quel caso ti scrive il motivo). Puoi seguire lo stato "
+                                + "nella pagina \"Le mie richieste\"."},
+                {"Cosa significa \"in attesa di conferma\"?",
+                        "Quando qualcuno invia una richiesta, il flash e la giornata scelti vengono bloccati finché "
+                                + "Charlotte non risponde. In questo modo non possono esserci due prenotazioni sullo "
+                                + "stesso flash. Se la richiesta viene rifiutata o annullata, tornano subito disponibili."},
+                {"Quando scopro l'orario preciso?",
+                        "Tu scegli solo il giorno e se preferisci mattina o pomeriggio. L'orario esatto te lo comunica "
+                                + "Charlotte quando accetta la richiesta: lo trovi nella pagina \"Le mie richieste\"."},
+                {"Dove sul corpo faccio il tatuaggio?",
+                        "La zona del corpo si decide insieme a Charlotte, che ti consiglia il punto migliore per il "
+                                + "disegno che hai scelto."},
+                {"Quanto dura un tatuaggio flash?",
+                        "Ogni appuntamento dura al massimo 2 ore, perché i flash sono disegni piccoli e veloci da "
+                                + "realizzare."},
+                {"Posso modificare un flash?",
+                        "I flash si tatuano come sono stati disegnati. Se vuoi qualcosa di personalizzato, usa il "
+                                + "modulo \"Consulenza\" e racconta la tua idea a Charlotte."},
+                {"Posso annullare una richiesta?",
+                        "Sì, dalla pagina \"Le mie richieste\" puoi annullare le richieste in attesa o già accettate. "
+                                + "Se non puoi più venire, annulla il prima possibile così il posto torna libero per "
+                                + "qualcun altro."},
+                {"Serve essere maggiorenni?", "Sì. Per tatuarsi è necessario essere maggiorenni."},
+                {"Quanto costa?",
+                        "Il prezzo dipende dalle dimensioni e dal disegno. Charlotte ti darà tutte le informazioni "
+                                + "quando risponde alla tua richiesta."},
+                {"Come funziona la consulenza?",
+                        "Compili il modulo con la tua idea e, se vuoi, allegando un'immagine di riferimento. Charlotte "
+                                + "lo legge e ti contatta via email o telefono per accordarsi sui dettagli."},
+                {"Ho dimenticato la password: cosa faccio?",
+                        "Dalla pagina di accesso clicca su \"Hai dimenticato la password?\" e segui il link per "
+                                + "sceglierne una nuova. Per accedere si usa sempre la tua email."}
+        };
+        for (String[] item : faqs) {
+            Faq faq = new Faq();
+            faq.setQuestion(item[0]);
+            faq.setAnswer(item[1]);
+            faqRepository.save(faq);
+        }
     }
 
     private void createAdmin() {

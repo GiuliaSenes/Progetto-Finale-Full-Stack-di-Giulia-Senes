@@ -3,15 +3,17 @@ import AdminBookings from './AdminBookings'
 import AdminFlashes from './AdminFlashes'
 import AdminSlots from './AdminSlots'
 import AdminConsultations from './AdminConsultations'
+import AdminFaqs from './AdminFaqs'
 
 const TABS = [
   { id: 'bookings', label: 'Richieste' },
   { id: 'flashes', label: 'Flash' },
   { id: 'slots', label: 'Disponibilità' },
   { id: 'consultations', label: 'Consulenze' },
+  { id: 'faqs', label: 'FAQ' },
 ]
 
-// Pannello di Charlotte: una pagina con 4 schede
+// Pannello di Charlotte: una pagina con 5 schede
 export default function AdminPanel() {
   const [tab, setTab] = useState('bookings')
 
@@ -37,6 +39,7 @@ export default function AdminPanel() {
       {tab === 'flashes' && <AdminFlashes />}
       {tab === 'slots' && <AdminSlots />}
       {tab === 'consultations' && <AdminConsultations />}
+      {tab === 'faqs' && <AdminFaqs />}
     </main>
   )
 }

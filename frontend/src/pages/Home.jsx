@@ -16,6 +16,7 @@ export default function Home() {
     <main>
       <section className="hero">
         <div className="container hero-inner">
+          <div className="hero-copy">
           <p className="eyebrow">Fine line · Microrealismo</p>
           <h1>Piccoli disegni, tratti sottilissimi.</h1>
           <p className="hero-text">
@@ -35,6 +36,17 @@ export default function Home() {
                 </Link>
               </>
             )}
+          </div>
+          </div>
+
+          {/* Foto di un tatuaggio fine line di Charlotte, sfumata nello sfondo */}
+          <div className="hero-art">
+            <img
+              src="/img/hero-tattoo.jpg"
+              alt="Tatuaggio fine line di un angioletto con la scritta Over Thinker"
+              width="660"
+              height="660"
+            />
           </div>
         </div>
       </section>

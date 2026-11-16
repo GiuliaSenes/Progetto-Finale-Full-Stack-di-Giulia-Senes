@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import Alert from '../components/Alert'
+import PasswordInput from '../components/PasswordInput'
 
 // Pagina aperta dal link di recupero: /reset-password?token=...
 export default function ResetPassword() {
@@ -65,8 +66,7 @@ export default function ResetPassword() {
 
         <label>
           Nuova password
-          <input
-            type="password"
+          <PasswordInput
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             autoComplete="new-password"
@@ -78,8 +78,7 @@ export default function ResetPassword() {
 
         <label>
           Conferma nuova password
-          <input
-            type="password"
+          <PasswordInput
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             autoComplete="new-password"

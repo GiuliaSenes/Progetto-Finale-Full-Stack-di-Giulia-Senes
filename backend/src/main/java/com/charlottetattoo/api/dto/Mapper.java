@@ -3,6 +3,7 @@ package com.charlottetattoo.api.dto;
 import com.charlottetattoo.api.model.AvailabilitySlot;
 import com.charlottetattoo.api.model.Booking;
 import com.charlottetattoo.api.model.Consultation;
+import com.charlottetattoo.api.model.Faq;
 import com.charlottetattoo.api.model.Flash;
 import com.charlottetattoo.api.model.User;
 
@@ -36,6 +37,10 @@ public class Mapper {
                 toSlot(booking.getSlot()), toUser(booking.getUser()), booking.getNote(),
                 booking.getStatus().name(), booking.getConfirmedTime(), booking.getRejectionReason(),
                 booking.getCreatedAt());
+    }
+
+    public static FaqResponse toFaq(Faq faq) {
+        return new FaqResponse(faq.getId(), faq.getQuestion(), faq.getAnswer());
     }
 
     public static ConsultationResponse toConsultation(Consultation c) {
