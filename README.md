@@ -9,6 +9,9 @@ C'è anche un modulo per richiedere una **consulenza** per un tatuaggio personal
 
 Progetto finale per il corso di start2impact.
 
+##NETLIFY
+https://progetto-finale-di-giulia-senes.netlify.app/
+
 ## Tecnologie
 
 | Parte    | Tecnologie |
@@ -16,22 +19,6 @@ Progetto finale per il corso di start2impact.
 | Backend  | Java 17, Spring Boot 3, Spring Security (JWT), Spring Data JPA, database H2 su file, Maven |
 | Frontend | React 19, React Router, Vite, CSS semplice |
 
-## Struttura del progetto
-
-```
-backend/    API REST (Spring Boot)
-  src/main/java/com/charlottetattoo/api/
-    model/        entità del database (User, Flash, AvailabilitySlot, Booking, Consultation)
-    repository/   accesso al database
-    service/      logica dell'applicazione
-    controller/   endpoint REST
-    security/     login JWT e protezione delle rotte
-    dto/          dati in entrata/uscita dalle API
-frontend/   interfaccia React
-  src/pages/        pagine (utente e pannello admin)
-  src/components/   componenti riutilizzabili (Navbar, Calendar...)
-  src/context/      gestione del login
-```
 
 ## Come avviarlo
 
@@ -61,10 +48,7 @@ caricate finiscono in `backend/uploads/`. Per ripartire da zero basta cancellare
 
 
 
-
-
 ## Funzionalità
-
 **Cliente**
 - Registrazione (con conferma password), login, logout, recupero password e modifica del profilo
 - Galleria dei flash con stato (disponibile / in attesa di conferma / non disponibile) e filtro
@@ -88,12 +72,9 @@ clienti la rimandano al pannello e il backend rifiuta prenotazioni e consulenze 
 
 Si accede con l'**email** (non esiste uno username separato). Dalla pagina di accesso, "Hai dimenticato la
 password?" genera un link monouso valido 60 minuti (nel database si salva solo l'hash del token).
-**Il progetto non invia email:** il link viene scritto nella **console del backend**, nella riga
-`RECUPERO PASSWORD per ...`. In un sito vero si collegherebbe un servizio di posta (es. Spring Mail) nel
-metodo `PasswordResetService.requestReset`.
+
 
 ### Come evitiamo le doppie prenotazioni
-
 Appena un cliente invia la richiesta, **il flash e lo slot si bloccano** (stato `PENDING`) in attesa della
 risposta di Charlotte. Nessun altro può sceglierli:
 
@@ -107,45 +88,12 @@ Nel database, flash e slot vengono letti con un blocco (`PESSIMISTIC_WRITE`), co
 contemporanei non possono prenotare la stessa cosa. Ogni cliente può avere al massimo 3 richieste in attesa
 (`app.max-pending-bookings`), per evitare che qualcuno blocchi tutta la galleria.
 
-## API REST
-
-Gli errori hanno sempre la forma `{"message": "testo in italiano"}`. Le rotte protette richiedono
-l'header `Authorization: Bearer <token>`.
-
-| Metodo | Percorso | Chi | Descrizione |
-|--------|----------|-----|-------------|
-| POST | `/api/auth/register` | tutti | Registrazione (restituisce il token) |
-| POST | `/api/auth/login` | tutti | Login (restituisce il token) |
-| POST | `/api/auth/forgot-password` | tutti | Richiede il link di recupero password |
-| POST | `/api/auth/reset-password` | tutti | Sceglie una nuova password con il token del link |
-| GET / PUT | `/api/users/me` | loggato | Vedi / modifica il tuo profilo |
-| PUT | `/api/users/me/password` | loggato | Cambia password |
-| GET | `/api/faqs` | tutti | Domande frequenti |
-| GET | `/api/flashes`, `/api/flashes/{id}` | loggato | Galleria dei flash |
-| GET | `/api/slots` | loggato | Giorni liberi (mattina / pomeriggio) |
-| POST | `/api/bookings` | loggato | Invia una richiesta di prenotazione |
-| GET | `/api/bookings/mine` | loggato | Le mie richieste |
-| PUT | `/api/bookings/{id}/cancel` | loggato | Annulla una mia richiesta |
-| POST | `/api/consultations` | loggato | Richiedi una consulenza (multipart) |
-| GET | `/api/consultations/mine` | loggato | Le mie consulenze |
-| POST | `/api/admin/flashes` | admin | Aggiungi un flash (multipart: `image`, `size`) |
-| PUT / DELETE | `/api/admin/flashes/{id}` | admin | Modifica stato / elimina un flash |
-| GET / POST | `/api/admin/slots` | admin | Elenco / aggiunta disponibilità |
-| DELETE | `/api/admin/slots/{id}` | admin | Elimina una disponibilità libera |
-| GET | `/api/admin/bookings?status=PENDING` | admin | Elenco richieste (filtro facoltativo) |
-| PUT | `/api/admin/bookings/{id}/accept` | admin | Accetta con l'orario preciso (`{"time": "15:30"}`) |
-| PUT | `/api/admin/bookings/{id}/reject` | admin | Rifiuta con un motivo |
-| POST | `/api/admin/faqs` | admin | Aggiungi una domanda frequente |
-| PUT / DELETE | `/api/admin/faqs/{id}` | admin | Modifica / elimina una domanda frequente |
-| GET | `/api/admin/consultations` | admin | Elenco consulenze |
-| PUT | `/api/admin/consultations/{id}/handled` | admin | Segna come gestita |
 
 ## Sicurezza
 
 - Le password sono salvate con hash **BCrypt**, mai in chiaro
 - Login con **JWT** (scade dopo 24 ore); chi si registra è sempre un cliente, mai admin
 - Le rotte `/api/admin/**` sono accessibili solo al ruolo `ADMIN`
-- Upload: solo JPG, PNG, WEBP fino a 5 MB, con nome file generato dal server
 
 ## Test
 
@@ -157,9 +105,3 @@ mvn test
 I test (`ApiFlowTest`) controllano registrazione e login, il recupero password, le rotte protette, e tutto il
 flusso delle prenotazioni: doppia prenotazione bloccata, rifiuto, accettazione con orario, annullamento e
 limite di richieste.
-
-## Possibili sviluppi futuri
-
-- Email automatiche (compreso il link di recupero password) alla tatuatrice e al cliente
-- Scadenza automatica delle richieste rimaste senza risposta
-- Preferiti sui flash e filtri per zona del corpo o dimensione
