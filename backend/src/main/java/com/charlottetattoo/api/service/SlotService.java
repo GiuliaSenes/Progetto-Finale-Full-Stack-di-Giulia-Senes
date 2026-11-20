@@ -69,7 +69,7 @@ public class SlotService {
 
     @Transactional
     public void delete(Long id) {
-        AvailabilitySlot slot = slotRepository.findByIdForUpdate(id)
+        AvailabilitySlot slot = slotRepository.findById(id)
                 .orElseThrow(() -> ApiException.notFound("Disponibilità non trovata"));
 
         if (slot.getStatus() != SlotStatus.FREE) {

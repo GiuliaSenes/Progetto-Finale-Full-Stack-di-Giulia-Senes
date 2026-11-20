@@ -48,7 +48,7 @@ public class FlashService {
 
     @Transactional
     public Flash update(Long id, FlashUpdateRequest request) {
-        Flash flash = flashRepository.findByIdForUpdate(id)
+        Flash flash = flashRepository.findById(id)
                 .orElseThrow(() -> ApiException.notFound("Flash non trovato"));
 
         if (request.status() == FlashStatus.PENDING) {
@@ -66,7 +66,7 @@ public class FlashService {
 
     @Transactional
     public void delete(Long id) {
-        Flash flash = flashRepository.findByIdForUpdate(id)
+        Flash flash = flashRepository.findById(id)
                 .orElseThrow(() -> ApiException.notFound("Flash non trovato"));
 
         boolean hasActiveBookings = bookingRepository.existsByFlashIdAndStatusIn(

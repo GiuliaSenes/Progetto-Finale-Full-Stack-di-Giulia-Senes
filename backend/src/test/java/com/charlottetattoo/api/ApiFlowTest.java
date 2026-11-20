@@ -11,13 +11,9 @@ import com.jayway.jsonpath.JsonPath;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
+import com.charlottetattoo.api.repository.PasswordResetTokenRepository;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -27,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 /** Test del flusso principale: registrazione, login, prenotazioni e doppia prenotazione. */
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(OutputCaptureExtension.class)
 class ApiFlowTest {
 
     // Ogni test usa una data diversa, cosi' gli slot dei test non si pestano i piedi
@@ -35,6 +30,9 @@ class ApiFlowTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private PasswordResetTokenRepository tokenRepository;
 
     // ---------- Autenticazione ----------
 
@@ -199,7 +197,7 @@ class ApiFlowTest {
     }
 
     @Test
-    void passwordCanBeResetWithTheLinkOnlyOnce(CapturedOutput output) throws Exception {
+    void passwordCanBeResetWithTheLinkOnlyOnce() throws Exception {
         String email = randomEmail();
         register(email);
 
@@ -211,10 +209,8 @@ class ApiFlowTest {
                         .content("{\"email\":\"" + email + "\"}"))
                 .andExpect(status().isOk());
 
-        // Il link finisce nel log del backend: ne estraiamo il token
-        Matcher matcher = Pattern.compile(email + ".*reset-password\\?token=([A-Za-z0-9_-]+)").matcher(output);
-        org.junit.jupiter.api.Assertions.assertTrue(matcher.find(), "link di reset non trovato nel log");
-        String token = matcher.group(1);
+        // Il codice del link è salvato nel database: lo leggiamo da lì
+        String token = tokenRepository.findByUserEmail(email).orElseThrow().getToken();
 
         // Token sbagliato -> 400
         mockMvc.perform(post("/api/auth/reset-password").contentType(MediaType.APPLICATION_JSON)

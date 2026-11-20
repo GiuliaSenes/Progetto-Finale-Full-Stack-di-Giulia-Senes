@@ -71,8 +71,10 @@ clienti la rimandano al pannello e il backend rifiuta prenotazioni e consulenze 
 ### Recupero password
 
 Si accede con l'**email** (non esiste uno username separato). Dalla pagina di accesso, "Hai dimenticato la
-password?" genera un link monouso valido 60 minuti (nel database si salva solo l'hash del token).
-
+password?" genera un link monouso valido 60 minuti.
+**Il progetto non invia email:** il link viene scritto nella **console del backend**, nella riga
+`RECUPERO PASSWORD per ...`. In un sito vero si collegherebbe un servizio di posta (es. Spring Mail) nel
+metodo `PasswordResetService.requestReset`.
 
 ### Come evitiamo le doppie prenotazioni
 Appena un cliente invia la richiesta, **il flash e lo slot si bloccano** (stato `PENDING`) in attesa della
@@ -84,8 +86,7 @@ risposta di Charlotte. Nessun altro può sceglierli:
 | Charlotte **accetta** (con l'orario) | non disponibile | prenotato |
 | Charlotte **rifiuta** o il cliente **annulla** | di nuovo disponibile | di nuovo libero |
 
-Nel database, flash e slot vengono letti con un blocco (`PESSIMISTIC_WRITE`), così anche due clic
-contemporanei non possono prenotare la stessa cosa. Ogni cliente può avere al massimo 3 richieste in attesa
+Prima di creare la richiesta il backend controlla che flash e slot siano ancora liberi. Ogni cliente può avere al massimo 3 richieste in attesa
 (`app.max-pending-bookings`), per evitare che qualcuno blocchi tutta la galleria.
 
 

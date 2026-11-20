@@ -58,11 +58,9 @@ public class BookingService {
                     + " richieste in attesa: aspetta la risposta di Charlotte prima di farne altre");
         }
 
-        // Blocchiamo flash e slot nel database: se due persone cliccano insieme,
-        // la seconda aspetta la fine della prima e poi trova gia' tutto occupato.
-        Flash flash = flashRepository.findByIdForUpdate(request.flashId())
+        Flash flash = flashRepository.findById(request.flashId())
                 .orElseThrow(() -> ApiException.notFound("Flash non trovato"));
-        AvailabilitySlot slot = slotRepository.findByIdForUpdate(request.slotId())
+        AvailabilitySlot slot = slotRepository.findById(request.slotId())
                 .orElseThrow(() -> ApiException.notFound("Data o orario non trovati"));
 
         if (flash.getStatus() == FlashStatus.PENDING) {
@@ -115,11 +113,8 @@ public class BookingService {
             throw ApiException.badRequest("Il cliente ha scelto " + period.labelWithArticle() + ": scegli un orario tra le "
                     + period.getStart() + " e le " + period.getEnd());
         }
-        Flash flash = lockFlash(booking);
-        AvailabilitySlot slot = lockSlot(booking);
-
-        flash.setStatus(FlashStatus.UNAVAILABLE);
-        slot.setStatus(SlotStatus.BOOKED);
+        booking.getFlash().setStatus(FlashStatus.UNAVAILABLE);
+        booking.getSlot().setStatus(SlotStatus.BOOKED);
         booking.setStatus(BookingStatus.ACCEPTED);
         booking.setConfirmedTime(time);
         return booking;
@@ -158,19 +153,9 @@ public class BookingService {
                 .orElseThrow(() -> ApiException.notFound("Richiesta non trovata"));
     }
 
-    // Ordine fisso (prima flash, poi slot) per evitare blocchi incrociati nel database
+    // Flash e slot tornano liberi
     private void releaseFlashAndSlot(Booking booking) {
-        lockFlash(booking).setStatus(FlashStatus.AVAILABLE);
-        lockSlot(booking).setStatus(SlotStatus.FREE);
-    }
-
-    private Flash lockFlash(Booking booking) {
-        return flashRepository.findByIdForUpdate(booking.getFlash().getId())
-                .orElseThrow(() -> ApiException.notFound("Flash non trovato"));
-    }
-
-    private AvailabilitySlot lockSlot(Booking booking) {
-        return slotRepository.findByIdForUpdate(booking.getSlot().getId())
-                .orElseThrow(() -> ApiException.notFound("Data o orario non trovati"));
+        booking.getFlash().setStatus(FlashStatus.AVAILABLE);
+        booking.getSlot().setStatus(SlotStatus.FREE);
     }
 }

@@ -20,5 +20,8 @@ frontend/dist/
 .DS_Store
 Thumbs.db
 
+# Appunti personali di studio (non vanno su GitHub)
+Guida-di-studio.md
+
 # Impostazioni locali di Claude Code
 .claude/

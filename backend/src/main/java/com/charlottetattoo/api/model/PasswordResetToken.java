@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
-/** Token monouso per reimpostare la password. Nel database salviamo solo l'hash, mai il token vero. */
+/** Codice monouso per reimpostare la password: scade dopo un'ora e si usa una volta sola. */
 @Entity
 public class PasswordResetToken {
 
@@ -20,7 +20,7 @@ public class PasswordResetToken {
     private User user;
 
     @Column(nullable = false, unique = true)
-    private String tokenHash;
+    private String token;
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
@@ -31,8 +31,8 @@ public class PasswordResetToken {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public String getTokenHash() { return tokenHash; }
-    public void setTokenHash(String tokenHash) { this.tokenHash = tokenHash; }
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
 
     public LocalDateTime getExpiresAt() { return expiresAt; }
     public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
